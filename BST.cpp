@@ -75,7 +75,8 @@ void BST::preorder(tree_node* p)
 {
     if(p != NULL)
     {
-        cout<<" "<<p->data<<" ";
+        if (p->isLeaf)
+            cout<<" "<<p->data<<" ";
         if(p->left) preorder(p->left);
         if(p->right) preorder(p->right);
     }

@@ -1,2 +1,5 @@
+*.swp
 *.o
 casexample
+sequential
+main
