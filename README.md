@@ -30,4 +30,6 @@ The class hierarchy is organized as follows:
 
 ---
 
+### References
+
 [1] F. Ellen, P. Fatourou, E. Ruppert., and Van Breugel, F. Non-blocking binary search trees.  PODC (2010), 131-140

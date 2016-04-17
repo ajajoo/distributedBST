@@ -69,6 +69,7 @@ vector<tnp> BST::search(int k)
 void BST::print_preorder()
 {
     preorder(root);
+    cout << endl;
 }
 
 void BST::preorder(tree_node* p)
