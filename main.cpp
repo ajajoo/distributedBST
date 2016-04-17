@@ -22,22 +22,28 @@ int main() {
 
     SequentialBST b;
     b.initializetree();
-    vector<tnp> vec = b.search(INT_MAX);
+    searchResult * res = b.search(INT_MAX);
+    if(res->l.load()->data == INT_MAX) {
+      cout<<"Found inf2"<<endl;
+    }
+    else {
+      cout<<"Could not Find inf2"<<endl;
+    }
     b.insert(6);
     b.insert(10);
     b.insert(7);
     b.insert(9);
     b.insert(14);
     b.insert(3);
-    vector<tnp> vec1 = b.search(9);
-    vector<tnp> vec2 = b.search(16);
-    if(vec1[2]->data == 9){
+    searchResult * res1 = b.search(9);
+    searchResult * res2 = b.search(16);
+    if(res1->l.load()->data == 9){
         cout<<"Found 9"<<endl;
     }
     else{
          cout<<"Could not Find 9"<<endl;
     }
-    if(vec2[2]->data == 16){
+    if(res2->l.load()->data == 16){
         cout<<"Found 16"<<endl;
     }
     else{
