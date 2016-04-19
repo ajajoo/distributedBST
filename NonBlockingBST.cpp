@@ -86,13 +86,14 @@ bool NonBlockingBST::insert(int k)
       updateRecord * ur = new updateRecord;
       ur->isDirty.store(true);
       ur->info.store(op.load());
-      tmpUpdate.store(ur);
+
+      updateRecord * pupdateVal = pupdate.load();
 
       bool casSuccess =
         atomic_compare_exchange_strong(
-          p.load()->update,
-          pupdate.load(),
-          tmpUpdate.load()
+          &(p.load()->update),
+          &(pupdateVal),
+          ur
         );
       if (casSuccess) {
         helpInsert(op);
