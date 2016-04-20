@@ -22,64 +22,71 @@ using namespace std;
 
 void BST::initializetree(){
  
-    tree_node* t = new tree_node;
-    tree_node* rootleft = new tree_node;
-    tree_node* rootright = new tree_node;
+    tnp t, rootleft, rootright;
+    t.store(new tree_node);
+    rootleft.store(new tree_node);
+    rootright.store(new tree_node);
     
-    rootleft->data = inf1;
-    rootleft->left = NULL;
-    rootleft->right = NULL;
-    rootleft->isLeaf = true;
+    rootleft.load()->data = inf1;
+    rootleft.load()->left.store(nullptr);
+    rootleft.load()->right.store(nullptr);
+    rootleft.load()->isLeaf.store(true);
     
-    rootright->data = inf2;
-    rootright->left = NULL;
-    rootright->right = NULL;
-    rootright->isLeaf = true;
+    rootright.load()->data = inf2;
+    rootright.load()->left.store(nullptr);
+    rootright.load()->right.store(nullptr);
+    rootright.load()->isLeaf.store(true);
     
-    t->data = inf2;
-    t->left = rootleft;
-    t->right = rootright;
-    t->isLeaf = false;
+    t.load()->data = inf2;
+    t.load()->left.store(rootleft);
+    t.load()->right.store(rootright);
+    t.load()->isLeaf.store(false);
    
-    root = t;
+    root.store(t);
 }
 
-vector<tnp> BST::search(int k)
+searchResult *
+BST::search(int k)
 {
-    vector<tnp> vec;
-    tnp gp = NULL;
-    tnp p = NULL;
-    tnp l = root;
-    do{
-        gp = p;
-        p = l;
-        if (k<l->data){
-            l = p->left;
+    urp pupdate;
+    tnp p,l;
+    p.store(nullptr);
+    pupdate.store(nullptr);
+    l.store(root);
+    do {
+        p.store(l);
+        pupdate.store(p.load()->update);
+
+        if (k < l.load()->data){
+            l.store(p.load()->left);
         }
         else{
-            l = p->right;
+            l.store(p.load()->right);
         }
-    }while(l->isLeaf != true);  
-    vec.push_back(gp);
-    vec.push_back(p);
-    vec.push_back(l);
-    return vec;
+    } while(l.load()->isLeaf.load() != true);  
+    searchResult * s = new searchResult;
+    s->p.store(p);
+    s->pupdate.store(pupdate);
+    s->l.store(l);
+    return s;
 }
 
 void BST::print_preorder()
 {
-    preorder(root);
+    preorder((tnp&)root);
     cout << endl;
 }
 
-void BST::preorder(tree_node* p)
+void BST::preorder(tnp &p)
 {
-    if(p != NULL)
+    if(p.load() != NULL)
     {
-        if (p->isLeaf)
-            cout<<" "<<p->data<<" ";
-        if(p->left) preorder(p->left);
-        if(p->right) preorder(p->right);
+        if (p.load()->isLeaf.load())
+          cout<<" "<<p.load()->data<<" ";
+        if(p.load()->left.load())
+          preorder(p.load()->left);
+        if(p.load()->right.load())
+          preorder(p.load()->right);
     }
     else return;
 }

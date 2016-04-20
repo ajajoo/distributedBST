@@ -1,0 +1,26 @@
+NonBlockingBST.cpp: In member function 'bool NonBlockingBST::insert(int)':
+NonBlockingBST.cpp:96:9: error: no matching function for call to 'atomic_compare_exchange_strong(std::atomic<BST::updateRecord*>&, std::atomic<BST::updateRecord*>::__pointer_type, std::atomic<BST::updateRecord*>::__pointer_type)'
+         );
+         ^
+NonBlockingBST.cpp:96:9: note: candidates are:
+In file included from NonBlockingBST.cpp:14:0:
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.9.3/include/g++-v4/atomic:946:5: note: template<class _ITp> bool std::atomic_compare_exchange_strong(std::atomic<_ITp>*, _ITp*, _ITp)
+     atomic_compare_exchange_strong(atomic<_ITp>* __a,
+     ^
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.9.3/include/g++-v4/atomic:946:5: note:   template argument deduction/substitution failed:
+NonBlockingBST.cpp:96:9: note:   mismatched types 'std::atomic<_ITp>*' and 'std::atomic<BST::updateRecord*>'
+         );
+         ^
+In file included from NonBlockingBST.cpp:14:0:
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.9.3/include/g++-v4/atomic:956:5: note: template<class _ITp> bool std::atomic_compare_exchange_strong(volatile std::atomic<_ITp>*, _ITp*, _ITp)
+     atomic_compare_exchange_strong(volatile atomic<_ITp>* __a,
+     ^
+/usr/lib/gcc/x86_64-pc-linux-gnu/4.9.3/include/g++-v4/atomic:956:5: note:   template argument deduction/substitution failed:
+NonBlockingBST.cpp:96:9: note:   mismatched types 'volatile std::atomic<_ITp>*' and 'std::atomic<BST::updateRecord*>'
+         );
+         ^
+NonBlockingBST.cpp: At global scope:
+NonBlockingBST.cpp:108:38: warning: unused parameter 'info' [-Wunused-parameter]
+ void NonBlockingBST::helpInsert(irp& info)
+                                      ^
+make: *** [NonBlockingBST.o] Error 1

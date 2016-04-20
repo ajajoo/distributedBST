@@ -1,16 +1,22 @@
 CXX=g++
-CXXFLAGS=-Wall -Wextra -pedantic-errors -std=c++11
+CXXFLAGS=-c -Wall -Wextra -pedantic-errors -std=c++11
+LDFLAGS=
+SOURCES=BST.cpp SequentialBST.cpp NonBlockingBST.cpp main.cpp
+OBJECTS=$(SOURCES:.cpp=.o)
+EXECUTABLES=BST
 
-all : casexample sequential main
+all : $(OBJECTS) $(EXECUTABLES)
 
-casexample : casexample.cpp
-	$(CXX) -o casexample casexample.cpp $(CXXFLAGS)
+.cpp.o :
+	$(CXX) $(CXXFLAGS) $< -o $@
 
-sequential : casexample.cpp
-	$(CXX) -o sequential casexample.cpp $(CXXFLAGS)
-
-main :
-	$(CXX) -o main main.cpp BST.cpp SequentialBST.cpp NonBlockingBST.cpp $(CXXFLAGS)
+$(EXECUTABLES) :
+	$(CXX) $(LDFLAGS) $(OBJECTS) -o $@
 
 clean :
-	rm -f casexample sequential main *.o
+	rm -f $(EXECUTABLES) *.o
+	rm -f casexample
+
+casexample : casexample.cpp
+	$(CXX) $(CXXFLAGS) casexample.cpp
+	$(CXX) $(LDFLAGS) casexample.o -o casexample
