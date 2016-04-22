@@ -1,4 +1,4 @@
-/*
+g*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -87,7 +87,8 @@ bool NonBlockingBST::insert(int k)
       ur->isDirty.store(true);
       ur->info.store(op.load());
 
-      updateRecord * pupdateVal = pupdate.load();
+	// a pointer variable will store address and load retuns the value or pointer??
+	updateRecord * pupdateVal = pupdate.load();
 
       bool casSuccess =
         atomic_compare_exchange_strong(
@@ -100,13 +101,23 @@ bool NonBlockingBST::insert(int k)
       }
       else {
         helpInsert(pupdate.load()->info);
-      }
-      
+      } 
     }
   }
 }
 
 void NonBlockingBST::helpInsert(irp& info)
 {
+	
+	// a pointer variable will store address and load retuns the value or pointer??
+	tree_node* l = info.load()->leaf.load();
+	tree_node* sb = new tree_node;
+	sb->left.store(info.load()->subtree.load()->left);
+	sb->right.store(info.load()->subtree.load()->right);
+	sb->update.store(info.load()->subtree.load()->update);
+	sb->isLeaf.store(info.load()->subtree.load()->isLeaf);
+	bool cassed = atomic_compare_exchange_strong(
+		&(info.load()->parent),
+		&(l),
+		sb);
 }
-
