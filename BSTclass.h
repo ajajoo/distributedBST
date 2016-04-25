@@ -24,63 +24,89 @@ using namespace std;
 
 class BST
 {
-    public:
-      struct updateRecord;
-      struct searchResult;
+  public:
+    struct updateRecord;
+    struct searchResult;
 
-      struct tree_node
+    struct treeNode
+    {
+      int data;
+      bool isLeaf;
+      atomic<treeNode*> left;
+      atomic<treeNode*> right;
+      atomic<updateRecord*> update;
+
+      treeNode(int d, bool b, treeNode *l = nullptr, treeNode *r = nullptr, 
+               updateRecord *u = nullptr)
+      : data(d), isLeaf(b)
       {
-        atomic<tree_node*> left;
-        atomic<tree_node*> right;
-        atomic<updateRecord*> update;
-        atomic<bool> isLeaf;
-        int data;
-      };
+        left.store(l);
+        right.store(r);
+        u ? update.store(u) : update.store(new updateRecord());
+      }
+    };
 
-      atomic<tree_node*> root;
+    atomic<treeNode*> root;
 
-      BST() {
-        root.store(nullptr);
-      };
+    BST() {
+      root.store(nullptr);
+    };
 
-      void print_preorder();
-      void preorder(atomic<tree_node*>&);
-      struct searchResult * search(int);
-      void initializetree();
+    void print_preorder();
+    void preorder(atomic<treeNode*>&);
+    struct searchResult * search(int);
+    void initializetree();
 
-      struct infoRecord {
-        atomic<tree_node*> parent;
-        atomic<tree_node*> leaf;
-        atomic<tree_node*> subtree;
-      };
-      struct updateRecord {
-        atomic<bool> isDirty;
-        atomic<infoRecord*> info;
-      };
+    struct infoRecord {
+      atomic<treeNode*> parent;
+      atomic<treeNode*> leaf;
+      atomic<treeNode*> subtree;
+
+      infoRecord(treeNode *p = nullptr, treeNode *l = nullptr, treeNode *s = nullptr)
+      {
+        parent.store(p);
+        leaf.store(l);
+        subtree.store(s);
+      }
+    };
+
+    struct updateRecord {
+      bool isDirty;
+      infoRecord* info;
+
+      updateRecord(bool b = false, infoRecord *i = nullptr)
+      : isDirty(b), info(i) {}
+    };
 };
 
-typedef atomic<BST::tree_node*> tnp;
+typedef atomic<BST::treeNode*> tnp;
 typedef atomic<BST::updateRecord*> urp;
 typedef atomic<BST::infoRecord*> irp;
 
 typedef struct BST::searchResult {
-  tnp p;
+  tnp *p;
   urp pupdate;
-  tnp l;
+  tnp *l;
+
+  searchResult(tnp *pp, updateRecord *uu, tnp *ll)
+  : p(pp), l(ll) {
+    pupdate.store(uu);
+  }
 } searchResult;
 
 class SequentialBST: public BST
 {
-    public:
-      void insert(int);    
+  public:
+    void insert(int);    
 };
 
 class NonBlockingBST: public BST
 {
-    private:
-      void helpInsert(irp&);
-    public:
-      bool insert(int);
+  private:
+    void helpInsert(infoRecord *);
+    bool CASChild(tnp *parent, treeNode *oldNode, treeNode *newNode);
+  public:
+    bool insert(int);
 };
 #endif /* CONST_H */
 

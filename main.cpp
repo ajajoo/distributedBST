@@ -11,6 +11,7 @@
  * Created on 14 April, 2016, 12:53 AM
  */
 
+#include <cassert>
 #include <iostream>
 #include "BSTclass.h"
 using namespace std;
@@ -18,37 +19,73 @@ using namespace std;
 /*
  * 
  */
-int main() {
 
-    SequentialBST b;
-    b.initializetree();
-    searchResult * res = b.search(INT_MAX);
-    if(res->l.load()->data == INT_MAX) {
-      cout<<"Found inf2"<<endl;
-    }
-    else {
-      cout<<"Could not Find inf2"<<endl;
-    }
-    b.insert(6);
-    b.insert(10);
-    b.insert(7);
-    b.insert(9);
-    b.insert(14);
-    b.insert(3);
-    searchResult * res1 = b.search(9);
-    searchResult * res2 = b.search(16);
-    if(res1->l.load()->data == 9){
-        cout<<"Found 9"<<endl;
-    }
-    else{
-         cout<<"Could not Find 9"<<endl;
-    }
-    if(res2->l.load()->data == 16){
-        cout<<"Found 16"<<endl;
-    }
-    else{
-         cout<<"Could not Find 16"<<endl;
-    }
-    b.print_preorder();
+void testInit(BST *b)
+{
+  cout << "Initializing new tree." << endl;
+  b->initializetree();
+  b->print_preorder();
+}
+
+void testSearch(BST *b, int val, bool expected)
+{
+  cout << "  Looking for " << val << "." << endl;
+  cout << "  (Expected to " << (expected ? "" : "not ") << "be in the tree.)" << endl;
+  searchResult * res = b->search(val);
+  assert((res->l->load()->data == val) == expected);
+  cout << "  " << val << (expected ? " found." : " not found.") << endl << endl;
+}
+
+void populateSeqTree(SequentialBST *b)
+{
+  int vals[6] = {6, 10, 7, 9, 14, 3};
+  for (int i = 0; i < 6; i++) {
+    b->insert(vals[i]);
+    cout << "  Inserted " << vals[i] << endl;
+  }
+}
+
+void populateNBTree(NonBlockingBST *b)
+{
+  int vals[6] = {6, 10, 7, 9, 14, 3};
+  for (int i = 0; i < 6; i++) {
+    b->insert(vals[i]);
+    cout << "  Inserted " << vals[i] << endl;
+  }
+}
+
+void testSequential()
+{
+  cout << "Testing sequential implementation." << endl;
+  SequentialBST b;
+  testInit(&b);
+  testSearch(&b, INT_MAX, true);
+  cout << "Populating tree." << endl;
+  populateSeqTree(&b);
+  cout << "Testing search." << endl;
+  testSearch(&b, 9, true);
+  testSearch(&b, 16, false);
+  b.print_preorder();
+  cout << endl;
+}
+
+void testNonblocking()
+{
+  cout << "Testing nonblocking implementation." << endl;
+  NonBlockingBST b;
+  testInit(&b);
+  testSearch(&b, INT_MAX, true);
+  cout << "Populating tree." << endl;
+  populateNBTree(&b);
+  cout << "Testing search." << endl;
+  testSearch(&b, 9, true);
+  testSearch(&b, 16, false);
+  b.print_preorder();
+  cout << endl;
+}
+
+int main() {
+  testSequential();
+  testNonblocking();
 }
 

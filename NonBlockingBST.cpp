@@ -1,4 +1,4 @@
-g*
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -21,103 +21,102 @@ using namespace std;
 
 bool NonBlockingBST::insert(int k)
 {
-  tnp p, newInternal, l, newSibling, newNode;
-  urp pupdate, result, tmpUpdate;
-  irp op;
+  atomic<treeNode *> *p;
+  treeNode *newInternal, *l, *newSibling, *newNode;
+  atomic<updateRecord *> *pupdate;
+  infoRecord * op;
 
   // Create new node containing k
-  newNode.store(new tree_node);
-  newNode.load()->data = k;
-  newNode.load()->left.store(nullptr);
-  newNode.load()->right.store(nullptr);
-  newNode.load()->update.store(nullptr);
-  newNode.load()->isLeaf.store(true);
+
+  newNode = new treeNode(k, true);
 
   while(true) {
     searchResult * s = search(k);
-    p.store(s->p);   
-    pupdate.store(s->pupdate);   
-    l.store(s->l);
+    p = s->p;
+    pupdate = &(s->pupdate);
+    l = (treeNode *)s->l;
 
     // Cannot insert duplicate key
-    if (l.load()->data == k)
+    if (l->data == k)
       return false;
 
     // Help the other operation
-    if (pupdate.load()->isDirty.load())
-      helpInsert(pupdate.load()->info);
+    if (pupdate->load()->isDirty)
+      helpInsert(pupdate->load()->info);
     else {
       // pointer to a new Leaf whose key is l->key
-      newSibling.store(new tree_node);
-      newSibling.load()->data = l.load()->data;
-      newSibling.load()->left.store(nullptr);
-      newSibling.load()->right.store(nullptr);
-      newSibling.load()->update.store(nullptr);
-      newSibling.load()->isLeaf.store(true);
+      newSibling = new treeNode(l->data, true);
 
-      bool newNodeIsSmaller = k < l.load()->data;
+      bool newNodeIsSmaller = k < l->data;
 
       // pointer to a new internal node
-      updateRecord * newInternalUpdate = new updateRecord;
-      newInternalUpdate->isDirty.store(false);
-      newInternalUpdate->info.store(nullptr);
+      updateRecord * newInternalUpdate = new updateRecord();
 
-      newInternal.store(new tree_node);
-      newInternal.load()->data = max(k, l.load()->data);
+      newInternal = new treeNode(max(k, l->data), true);
       if (newNodeIsSmaller) {
-        newInternal.load()->left.store(newNode.load());
-        newInternal.load()->right.store(newSibling.load());
+        newInternal->left.store(newNode);
+        newInternal->right.store(newSibling);
       }
       else {
-        newInternal.load()->left.store(newSibling.load());
-        newInternal.load()->right.store(newNode.load());
+        newInternal->left.store(newSibling);
+        newInternal->right.store(newNode);
       }
-      newInternal.load()->update.store(newInternalUpdate);
-      newInternal.load()->isLeaf.store(false);
+      newInternal->update.store(newInternalUpdate);
      
       // pointer to a new iinfo record containing <p, l, newInternal>
-      infoRecord * newInfo = new infoRecord;
-      newInfo->parent.store(p.load());
-      newInfo->leaf.store(l.load());
-      newInfo->subtree.store(newInternal.load());
-      op.store(newInfo);
+      op = new infoRecord(p->load(), l, newInternal);
 
       // attempt to cas for result
-      updateRecord * ur = new updateRecord;
-      ur->isDirty.store(true);
-      ur->info.store(op.load());
+      updateRecord * ur = new updateRecord(true, op);
 
-	// a pointer variable will store address and load retuns the value or pointer??
-	updateRecord * pupdateVal = pupdate.load();
+      // a pointer variable will store address and load retuns the value or pointer??
+      updateRecord * pupdateVal = pupdate->load();
 
-      bool casSuccess =
-        atomic_compare_exchange_strong(
-          &(p.load()->update),
-          &(pupdateVal),
-          ur
-        );
+      bool casSuccess = (p->load()->update).
+        compare_exchange_strong(pupdateVal, ur);
       if (casSuccess) {
         helpInsert(op);
       }
       else {
-        helpInsert(pupdate.load()->info);
+        helpInsert(pupdate->load()->info);
       } 
     }
   }
 }
 
-void NonBlockingBST::helpInsert(irp& info)
+void NonBlockingBST::helpInsert(infoRecord* info)
 {
-	
+  tnp *p = &(info->parent);
+  treeNode * l = info->leaf.load();
+  treeNode * s = info->subtree.load();
+
+  updateRecord * oldUR = new updateRecord(true, info),
+               * newUR = new updateRecord(false, info);
+
+  CASChild(p, l, s); 
+  info->parent.load()->update.
+      compare_exchange_strong(oldUR, newUR);
+
+/*	
 	// a pointer variable will store address and load retuns the value or pointer??
-	tree_node* l = info.load()->leaf.load();
-	tree_node* sb = new tree_node;
+	treeNode* l = info.load()->leaf.load();
+	treeNode* sb = new treeNode;
 	sb->left.store(info.load()->subtree.load()->left);
 	sb->right.store(info.load()->subtree.load()->right);
 	sb->update.store(info.load()->subtree.load()->update);
-	sb->isLeaf.store(info.load()->subtree.load()->isLeaf);
-	bool cassed = atomic_compare_exchange_strong(
+	sb->isLeaf = info.load()->subtree.load()->isLeaf;
+	bool cassed = atomic_compare_exchange_strong
 		&(info.load()->parent),
 		&(l),
 		sb);
+*/
+}
+
+bool NonBlockingBST::CASChild(tnp *parent, treeNode *oldNode, treeNode *newNode)
+{
+  tnp *childToChange = (newNode->data < parent->load()->data)
+    ? &(parent->load()->left)
+    : &(parent->load()->right);
+  
+  return childToChange->compare_exchange_strong(oldNode, newNode);
 }
