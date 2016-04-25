@@ -73,9 +73,8 @@ bool NonBlockingBST::insert(int k)
       updateRecord * pupdateVal = pupdate.load();
 
       bool casSuccess =
-        atomic_compare_exchange_strong(
-          &(p.load()->update),
-          &(pupdateVal),
+        (p.load()->update).compare_exchange_strong(
+          pupdateVal,
           ur
         );
       if (casSuccess) {
@@ -90,8 +89,7 @@ bool NonBlockingBST::insert(int k)
 
 void NonBlockingBST::helpInsert(infoRecord* info)
 {
-  tnp *p;
-  p = info->parent;
+  tnp *p = &(info->parent);
   treeNode * l = info->leaf.load();
   treeNode * s = info->subtree.load();
 
@@ -99,10 +97,8 @@ void NonBlockingBST::helpInsert(infoRecord* info)
                * newUR = new updateRecord(false, info);
 
   CASChild(p, l, s); 
-  atomic_compare_exchange_strong(
-    &(info->parent.load()->update),
-    oldUR,
-    newUR);
+  info->parent.load()->update.
+      compare_exchange_strong(oldUR, newUR);
 
 /*	
 	// a pointer variable will store address and load retuns the value or pointer??
@@ -119,11 +115,11 @@ void NonBlockingBST::helpInsert(infoRecord* info)
 */
 }
 
-bool NonBlockingBST::CASChild(tnp parent, treeNode *oldNode, treeNode *newNode)
+bool NonBlockingBST::CASChild(tnp *parent, treeNode *oldNode, treeNode *newNode)
 {
-  tnp *childToChange = (newNode->data < parent.load()->data)
-    ? &(parent.load()->left)
-    : &(parent.load()->right);
+  tnp *childToChange = (newNode->data < parent->load()->data)
+    ? &(parent->load()->left)
+    : &(parent->load()->right);
   
-  return atomic_compare_exchange_strong(childToChange, &oldNode, newNode);
+  return childToChange->compare_exchange_strong(oldNode, newNode);
 }

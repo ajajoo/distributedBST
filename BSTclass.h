@@ -99,7 +99,7 @@ class NonBlockingBST: public BST
 {
   private:
     void helpInsert(infoRecord *);
-    bool CASChild(tnp parent, treeNode *oldNode, treeNode *newNode);
+    bool CASChild(tnp *parent, treeNode *oldNode, treeNode *newNode);
   public:
     bool insert(int);
 };
