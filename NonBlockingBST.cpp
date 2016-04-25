@@ -21,9 +21,9 @@ using namespace std;
 
 bool NonBlockingBST::insert(int k)
 {
-  atomic<treeNode *> p;
+  atomic<treeNode *> *p;
   treeNode *newInternal, *l, *newSibling, *newNode;
-  atomic<updateRecord *> pupdate;
+  atomic<updateRecord *> *pupdate;
   infoRecord * op;
 
   // Create new node containing k
@@ -32,8 +32,8 @@ bool NonBlockingBST::insert(int k)
 
   while(true) {
     searchResult * s = search(k);
-    p.store(s->p);   
-    pupdate.store(s->pupdate);
+    p = s->p;
+    pupdate = &(s->pupdate);
     l = (treeNode *)s->l;
 
     // Cannot insert duplicate key
@@ -41,8 +41,8 @@ bool NonBlockingBST::insert(int k)
       return false;
 
     // Help the other operation
-    if (pupdate.load()->isDirty)
-      helpInsert(pupdate.load()->info);
+    if (pupdate->load()->isDirty)
+      helpInsert(pupdate->load()->info);
     else {
       // pointer to a new Leaf whose key is l->key
       newSibling = new treeNode(l->data, true);
@@ -64,24 +64,21 @@ bool NonBlockingBST::insert(int k)
       newInternal->update.store(newInternalUpdate);
      
       // pointer to a new iinfo record containing <p, l, newInternal>
-      op = new infoRecord(p.load(), l, newInternal);
+      op = new infoRecord(p->load(), l, newInternal);
 
       // attempt to cas for result
       updateRecord * ur = new updateRecord(true, op);
 
       // a pointer variable will store address and load retuns the value or pointer??
-      updateRecord * pupdateVal = pupdate.load();
+      updateRecord * pupdateVal = pupdate->load();
 
-      bool casSuccess =
-        (p.load()->update).compare_exchange_strong(
-          pupdateVal,
-          ur
-        );
+      bool casSuccess = (p->load()->update).
+        compare_exchange_strong(pupdateVal, ur);
       if (casSuccess) {
         helpInsert(op);
       }
       else {
-        helpInsert(pupdate.load()->info);
+        helpInsert(pupdate->load()->info);
       } 
     }
   }

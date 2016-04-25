@@ -21,7 +21,7 @@
 using namespace std;
 
 void BST::initializetree(){
-  tnp t, rootleft, rootright;
+  tnp rootleft, rootright;
   rootleft.store(new treeNode(inf1, true));
   rootright.store(new treeNode(inf2, true));
   root.store(new treeNode(inf2, false, rootleft, rootright));
@@ -31,25 +31,22 @@ searchResult *
 BST::search(int k)
 {
   urp pupdate;
-  tnp p,l;
-  p.store(nullptr);
+  tnp *p, *l = &root;
   pupdate.store(nullptr);
-  l.store(root);
   do {
-    p.store(l);
-    pupdate.store(p.load()->update);
+    p = l;
+    pupdate.store(p->load()->update);
 
-    if (k < l.load()->data){
-      l.store(p.load()->left);
+    if (k < l->load()->data){
+      l = &(p->load()->left);
     }
-    else{
-      l.store(p.load()->right);
+    else {
+      l = &(p->load()->right);
     }
-  } while(l.load()->isLeaf != true);  
-  searchResult * s = new searchResult;
-  s->p.store(p);
-  s->pupdate.store(pupdate);
-  s->l.store(l);
+  } while(l->load()->isLeaf != true);
+
+  searchResult * s = new searchResult(p, pupdate, l);
+  
   return s;
 }
 

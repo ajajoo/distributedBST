@@ -84,9 +84,14 @@ typedef atomic<BST::updateRecord*> urp;
 typedef atomic<BST::infoRecord*> irp;
 
 typedef struct BST::searchResult {
-  tnp p;
+  tnp *p;
   urp pupdate;
-  tnp l;
+  tnp *l;
+
+  searchResult(tnp *pp, updateRecord *uu, tnp *ll)
+  : p(pp), l(ll) {
+    pupdate.store(uu);
+  }
 } searchResult;
 
 class SequentialBST: public BST
