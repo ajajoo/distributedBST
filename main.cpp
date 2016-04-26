@@ -20,13 +20,6 @@ using namespace std;
  * 
  */
 
-void testInit(BST *b)
-{
-  cout << "Initializing new tree." << endl;
-  b->initializetree();
-  b->print_preorder();
-}
-
 void testSearch(BST *b, int val, bool expected)
 {
   cout << "  Looking for " << val << "." << endl;
@@ -57,8 +50,10 @@ void populateNBTree(NonBlockingBST *b)
 void testSequential()
 {
   cout << "Testing sequential implementation." << endl;
+  cout << "----------------------------------" << endl;
+  cout << "Initializing new tree." << endl;
   SequentialBST b;
-  testInit(&b);
+  b->print_preorder();
   testSearch(&b, INT_MAX, true);
   cout << "Populating tree." << endl;
   populateSeqTree(&b);
@@ -72,8 +67,11 @@ void testSequential()
 void testNonblocking()
 {
   cout << "Testing nonblocking implementation." << endl;
+  cout << "-----------------------------------" << endl;
+  cout << "Initializing new tree." << endl;
   NonBlockingBST b;
-  testInit(&b);
+  b->print_preorder();
+  cout << "Testing nonblocking implementation." << endl;
   testSearch(&b, INT_MAX, true);
   cout << "Populating tree." << endl;
   populateNBTree(&b);
