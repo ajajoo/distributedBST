@@ -1,6 +1,6 @@
 CXX=g++
 CXXFLAGS=-c -Wall -Wextra -pedantic-errors -std=c++11
-LDFLAGS=
+LDFLAGS=-latomic
 SOURCES=BST.cpp SequentialBST.cpp NonBlockingBST.cpp main.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLES=BST
@@ -10,7 +10,7 @@ all : $(OBJECTS) $(EXECUTABLES)
 .cpp.o :
 	$(CXX) $(CXXFLAGS) $< -o $@
 
-$(EXECUTABLES) :
+$(EXECUTABLES) : $(OBJECTS)
 	$(CXX) $(LDFLAGS) $(OBJECTS) -o $@
 
 clean :

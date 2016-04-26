@@ -20,53 +20,44 @@
 
 using namespace std;
 
-void BST::initializetree(){
-  tnp rootleft, rootright;
-  rootleft.store(new treeNode(inf1, true));
-  rootright.store(new treeNode(inf2, true));
-  root.store(new treeNode(inf2, false, rootleft, rootright));
-}
-
 searchResult *
 BST::search(int k)
 {
-  urp pupdate;
-  tnp *p, *l = &root;
-  pupdate.store(nullptr);
+  atomic<treeNode*> p, l;
+  updateRecord pupdate;
+  l.store(root);
   do {
-    p = l;
-    pupdate.store(p->load()->update);
+    p.store(l);
+    pupdate = l.load()->update.load();
 
-    if (k < l->load()->data){
-      l = &(p->load()->left);
+    if (k < l.load()->data){
+      l.store(p.load()->left);
     }
     else {
-      l = &(p->load()->right);
+      l.store(p.load()->right);
     }
-  } while(l->load()->isLeaf != true);
+  } while(!(l.load()->isLeaf));
 
-  searchResult * s = new searchResult(p, pupdate, l);
-  
-  return s;
+  return new searchResult(p, l, pupdate);
 }
 
 void BST::print_preorder()
 {
-  preorder((tnp&)root);
+  preorder(root.load());
   cout << endl;
 }
 
-void BST::preorder(tnp &p)
+void BST::preorder(treeNode *p)
 {
-  if(p.load() != nullptr)
-  {
-    if (p.load()->isLeaf)
-      cout<<" "<<p.load()->data<<" ";
-    if(p.load()->left.load())
-      preorder(p.load()->left);
-    if(p.load()->right.load())
-      preorder(p.load()->right);
+  if(!p) return;
+
+  if (p->isLeaf)
+    cout << " " << p->data << " ";
+  else {
+    treeNode *l = p->left.load(),
+             *r = p->right.load(); 
+    if(l) preorder(l);
+    if(r) preorder(r);
   }
-  else return;
 }
 

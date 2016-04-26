@@ -20,19 +20,12 @@ using namespace std;
  * 
  */
 
-void testInit(BST *b)
-{
-  cout << "Initializing new tree." << endl;
-  b->initializetree();
-  b->print_preorder();
-}
-
 void testSearch(BST *b, int val, bool expected)
 {
   cout << "  Looking for " << val << "." << endl;
   cout << "  (Expected to " << (expected ? "" : "not ") << "be in the tree.)" << endl;
   searchResult * res = b->search(val);
-  assert((res->l->load()->data == val) == expected);
+  assert((res->l.load()->data == val) == expected);
   cout << "  " << val << (expected ? " found." : " not found.") << endl << endl;
 }
 
@@ -57,30 +50,35 @@ void populateNBTree(NonBlockingBST *b)
 void testSequential()
 {
   cout << "Testing sequential implementation." << endl;
+  cout << "----------------------------------" << endl;
+  cout << "Initializing new tree." << endl;
   SequentialBST b;
-  testInit(&b);
+  b.print_preorder();
   testSearch(&b, INT_MAX, true);
   cout << "Populating tree." << endl;
   populateSeqTree(&b);
+  b.print_preorder();
   cout << "Testing search." << endl;
   testSearch(&b, 9, true);
   testSearch(&b, 16, false);
-  b.print_preorder();
   cout << endl;
 }
 
 void testNonblocking()
 {
   cout << "Testing nonblocking implementation." << endl;
+  cout << "-----------------------------------" << endl;
+  cout << "Initializing new tree." << endl;
   NonBlockingBST b;
-  testInit(&b);
+  b.print_preorder();
+  cout << "Testing nonblocking implementation." << endl;
   testSearch(&b, INT_MAX, true);
   cout << "Populating tree." << endl;
   populateNBTree(&b);
+  b.print_preorder();
   cout << "Testing search." << endl;
   testSearch(&b, 9, true);
   testSearch(&b, 16, false);
-  b.print_preorder();
   cout << endl;
 }
 
