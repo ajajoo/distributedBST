@@ -29,10 +29,6 @@ class BST
     struct updateRecord {
       bool isDirty;
       infoRecord *info;
-/*
-      updateRecord(bool b = false, infoRecord *i = nullptr)
-      : isDirty(b), info(i) {}
-      */
     };
     struct searchResult;
 

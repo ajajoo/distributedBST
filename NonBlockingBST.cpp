@@ -73,11 +73,11 @@ void NonBlockingBST::helpInsert(infoRecord* op)
 
 bool NonBlockingBST::CASChild(treeNode *parent, treeNode *oldNode, treeNode *newNode)
 {
-  atomic<treeNode*> childToChange;
+  atomic<treeNode*> *childToChange;
   if (newNode->data < parent->data)
-    childToChange.store(parent->left.load());
+    childToChange = &(parent->left);
   else
-    childToChange.store(parent->right.load());
+    childToChange = &(parent->right);
   
-  return childToChange.compare_exchange_strong(oldNode, newNode);
+  return childToChange->compare_exchange_strong(oldNode, newNode);
 }
