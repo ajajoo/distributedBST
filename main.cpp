@@ -57,10 +57,10 @@ void testSequential()
   testSearch(&b, INT_MAX, true);
   cout << "Populating tree." << endl;
   populateSeqTree(&b);
+  b.print_preorder();
   cout << "Testing search." << endl;
   testSearch(&b, 9, true);
   testSearch(&b, 16, false);
-  b.print_preorder();
   cout << endl;
 }
 
@@ -75,10 +75,10 @@ void testNonblocking()
   testSearch(&b, INT_MAX, true);
   cout << "Populating tree." << endl;
   populateNBTree(&b);
+  b.print_preorder();
   cout << "Testing search." << endl;
   testSearch(&b, 9, true);
   testSearch(&b, 16, false);
-  b.print_preorder();
   cout << endl;
 }
 

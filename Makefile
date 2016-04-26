@@ -10,7 +10,7 @@ all : $(OBJECTS) $(EXECUTABLES)
 .cpp.o :
 	$(CXX) $(CXXFLAGS) $< -o $@
 
-$(EXECUTABLES) :
+$(EXECUTABLES) : $(OBJECTS)
 	$(CXX) $(LDFLAGS) $(OBJECTS) -o $@
 
 clean :
