@@ -25,7 +25,7 @@ void testSearch(BST *b, int val, bool expected)
   cout << "  Looking for " << val << "." << endl;
   cout << "  (Expected to " << (expected ? "" : "not ") << "be in the tree.)" << endl;
   searchResult * res = b->search(val);
-  assert((res->l->load()->data == val) == expected);
+  assert((res->l.load()->data == val) == expected);
   cout << "  " << val << (expected ? " found." : " not found.") << endl << endl;
 }
 
@@ -53,7 +53,7 @@ void testSequential()
   cout << "----------------------------------" << endl;
   cout << "Initializing new tree." << endl;
   SequentialBST b;
-  b->print_preorder();
+  b.print_preorder();
   testSearch(&b, INT_MAX, true);
   cout << "Populating tree." << endl;
   populateSeqTree(&b);
@@ -70,7 +70,7 @@ void testNonblocking()
   cout << "-----------------------------------" << endl;
   cout << "Initializing new tree." << endl;
   NonBlockingBST b;
-  b->print_preorder();
+  b.print_preorder();
   cout << "Testing nonblocking implementation." << endl;
   testSearch(&b, INT_MAX, true);
   cout << "Populating tree." << endl;

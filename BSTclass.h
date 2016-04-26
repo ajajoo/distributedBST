@@ -29,11 +29,11 @@ class BST
     struct updateRecord {
       bool isDirty;
       infoRecord *info;
-
+/*
       updateRecord(bool b = false, infoRecord *i = nullptr)
       : isDirty(b), info(i) {}
+      */
     };
-    updateRecord *emptyUR;
     struct searchResult;
 
     struct treeNode
@@ -45,19 +45,23 @@ class BST
       atomic<updateRecord> update;
 
       treeNode(int d, bool b, treeNode *l = nullptr, treeNode *r = nullptr,
-               updateRecord *u = nullptr)
+               updateRecord *u = NULL)
       : data(d), isLeaf(b)
       {
         left.store(l);
         right.store(r);
-        u ? update.store(*u) : update.store(*emptyUR);
+        if (u)
+          update.store(*u);
+        else {
+          updateRecord emptyUR = {false, nullptr};
+          update.store(emptyUR);
+        }
       }
     };
 
     atomic<treeNode*> root;
 
     BST() {
-      emptyUR = new updateRecord();
       treeNode * rleft  = new treeNode(inf1, true);
       treeNode * rright = new treeNode(inf2, true);
       root.store(new treeNode(inf2, false, rleft, rright));
@@ -82,11 +86,15 @@ class BST
 };
 
 typedef struct BST::searchResult {
-  treeNode *p, *l;
+  atomic<treeNode *> p, l;
   updateRecord pupdate;
 
   searchResult(treeNode *pp, treeNode *ll, updateRecord uu)
-  : p(pp), l(ll), pupdate(uu) {}
+  : pupdate(uu) 
+  {
+    p.store(pp);
+    l.store(ll);
+  }
 } searchResult;
 
 class SequentialBST: public BST

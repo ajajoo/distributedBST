@@ -103,7 +103,7 @@ void NonBlockingBST::helpInsert(infoRecord* info)
   */
 }
 
-bool NonBlockingBST::CASChild(tnp *parent, treeNode *oldNode, treeNode *newNode)
+bool NonBlockingBST::CASChild(treeNode *parent, treeNode *oldNode, treeNode *newNode)
 {
   /*
   tnp *childToChange = (newNode->data < parent->load()->data)

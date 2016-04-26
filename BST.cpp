@@ -23,19 +23,20 @@ using namespace std;
 searchResult *
 BST::search(int k)
 {
-  treeNode *p, *l = root.load();
+  atomic<treeNode*> p, l;
   updateRecord pupdate;
+  l.store(root);
   do {
-    p = l;
-    pupdate = l->update.load();
+    p.store(l);
+    pupdate = l.load()->update.load();
 
-    if (k < l->data){
-      l = p->left.load();
+    if (k < l.load()->data){
+      l.store(p.load()->left);
     }
     else {
-      l = p->left.load();
+      l.store(p.load()->right);
     }
-  } while(!(l->isLeaf));
+  } while(!(l.load()->isLeaf));
 
   return new searchResult(p, l, pupdate);
 }

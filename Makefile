@@ -1,6 +1,6 @@
 CXX=g++
 CXXFLAGS=-c -Wall -Wextra -pedantic-errors -std=c++11
-LDFLAGS=
+LDFLAGS=-latomic
 SOURCES=BST.cpp SequentialBST.cpp NonBlockingBST.cpp main.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLES=BST
