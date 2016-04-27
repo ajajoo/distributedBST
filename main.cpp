@@ -13,6 +13,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <thread>
 #include "BSTclass.h"
 using namespace std;
 
@@ -82,8 +83,42 @@ void testNonblocking()
   cout << endl;
 }
 
-int main() {
-  testSequential();
-  testNonblocking();
+void threadNBTreeFunc(NonBlockingBST *b){
+	int j=rand()%10+1;
+	for(int i=0;i<j;i++){
+		int k = rand() % 1000 + 1;
+		b->insert(k);
+	}
+}
+
+void test(int numthreads,int times){
+
+	float sum = 0;
+	clock_t begin_time,end_time;
+	for(int i=0;i<times;i++){
+		NonBlockingBST b;
+		vector<thread> myThreads;
+		begin_time = clock();
+   		for (int i=0; i<numthreads; i++){
+      			myThreads.push_back(thread(threadNBTreeFunc, &b));
+   		}
+   		for (int i=0; i<numthreads; i++){
+			myThreads.at(i).join();
+    		}
+   		end_time = clock();
+    		sum += float(end_time - begin_time);
+	}
+	sum /= times;
+	cout<<"Time taken with "<<numthreads<<" threads is "<<sum<<endl; 
+}
+
+int main(int argc, char* argv[]) {
+  //testSequential();
+  //testNonblocking();
+  int numthreads,times;
+  numthreads = atoi(argv[1]);
+  times = atoi(argv[2]);
+  test(numthreads,times);
+  return 0;
 }
 
