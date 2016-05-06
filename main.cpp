@@ -13,6 +13,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <string>
 #include <thread>
 #include "BSTclass.h"
 using namespace std;
@@ -113,12 +114,36 @@ void test(int numthreads,int times){
 }
 
 int main(int argc, char* argv[]) {
-  //testSequential();
-  //testNonblocking();
-  int numthreads,times;
-  numthreads = atoi(argv[1]);
-  times = atoi(argv[2]);
-  test(numthreads,times);
+  if (argc == 2) {
+    string s("test");
+    string t(argv[1]);
+    if (s != t) {
+      cout << "Usage: ./BST test" << endl
+           << "   or  ./BST time <numThreads> <Times>" << endl;
+      return 1;
+    }
+    // Run BST test
+    testSequential();
+    testNonblocking();
+  }
+  else if (argc == 4) {
+    string s("time");
+    string t(argv[1]);
+    if (s != t) {
+      cout << "Usage: ./BST test" << endl
+           << "   or  ./BST time <numThreads> <Times>" << endl;
+      return 1;
+    }
+    int numthreads = atoi(argv[2]);
+    int times = atoi(argv[3]);
+    test(numthreads,times);
+
+  }
+  else {
+    cout << "Usage: ./BST test" << endl
+         << "   or  ./BST time <numThreads> <Times>" << endl;
+    return 1;
+  }
   return 0;
 }
 

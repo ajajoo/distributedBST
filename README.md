@@ -12,16 +12,23 @@ We have included a reference sequential implementation in `SequentialBST.cpp` an
 
 ### User notes
 
-The code requires a more modern version of G++ than is available on most of the CS lab machines. The code was tested on the machine `mc18.cs.purdue.edu`, which has G++ v. 5.3.0. under `g++-5.3.0`.  If running on a personal machine with an up-to-date G++ version installed, please replace the CXX variable in the makefile with `CXX=g++`.
+The code requires a more modern version of g++ than is available on most of the CS lab machines. The code was tested on the machine `mc18.cs.purdue.edu`, which has G++ v. 5.3.0. under `g++-5.3.0`.  The Makefile was set up to use this compiler if on `mc18` and to otherwise use `g++`; if testing on a personal machine, please ensure your g++ version is up-to-date to avoid spurious segmentation faults.
 
-### Sequential implementation
-
-To run the sequential leaf oriented BST code, run the following commands:
+To compile the code, run the following command.
 
     $ make
-    $ ./main
 
-`main` contains examples of calling `insert`, `search` and printing the tree in a pre-order fashion.
+A simple test of the implementation can be reached by typing
+
+    $ ./BST test
+
+This test contains examples of inserting into the tree and searching the tree.
+
+Timing of concurrent insertions can be reached by typing
+
+    $ ./BST time <numThreads> <iterations>
+
+This will repeat a simple test <iterations> number of times: 
 
 ---
 

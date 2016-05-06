@@ -150,26 +150,26 @@ int test(int option,int numthreads,int times){
 	for(int i=0;i<times;i++){
 		BST b;
 		b.initializetree();
-		if(option==1){
-			vector<thread> myThreads;
-			begin_time = clock();
-	   		for (int i=0; i<numthreads; i++){
-	      			myThreads.push_back(thread(exec, b));
-	   		}
-	   		for (int i=0; i<numthreads; i++){
-				myThreads[i].join();
-	    		}
-	   		end_time = clock();
-	    		sum += float(end_time - begin_time);
-	    	}
-	    	else if(option==2){
-			begin_time = clock();
-		    	for (int i=0; i<numthreads; i++){
-				exec(b);
-		    	}
-		    	end_time = clock();
-		    	sum += float(end_time - begin_time);
-	    	}
+    if(option==1){
+      vector<thread> myThreads;
+      begin_time = clock();
+      for (int i=0; i<numthreads; i++){
+        myThreads.push_back(thread(exec, b));
+      }
+      for (int i=0; i<numthreads; i++){
+        myThreads[i].join();
+      }
+      end_time = clock();
+      sum += float(end_time - begin_time);
+    }
+    else if(option==2){
+      begin_time = clock();
+      for (int i=0; i<numthreads; i++){
+        exec(b);
+      }
+      end_time = clock();
+      sum += float(end_time - begin_time);
+    }
 	}
 	sum /= times;
 	cout<<numthreads<<":"<<option<<":"<<sum<<endl; 
