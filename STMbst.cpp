@@ -143,46 +143,102 @@ void exec(BST b){
 	}
 }
 
-int test(int option,int numthreads,int times){
+void testSearch(BST *b, int val, bool expected)
+{
+  cout << "  Looking for " << val << "." << endl;
+  cout << "  (Expected to " << (expected ? "" : "not ") << "be in the tree.)" << endl;
+  vector<tnp> vec = b->search(val);
+  tnp newinternal = vec[2];
+  if(newinternal->data == val){
+	  cout << "  " << val << (expected ? " found." : " not found.") << endl << endl;
+  }
+  
+}
+
+void populateSTMTree(BST *b)
+{
+  int vals[6] = {6, 10, 7, 9, 14, 3};
+  for (int i = 0; i < 6; i++) {
+    b->insert(vals[i]);
+    cout << "  Inserted " << vals[i] << endl;
+  }
+}
+
+void testSTM()
+{
+  cout << "Testing STM implementation." << endl;
+  cout << "-----------------------------------" << endl;
+  cout << "Initializing new tree." << endl;
+  BST b;
+  b.initializetree();
+  b.print_preorder();
+  cout << "Testing nonblocking implementation." << endl;
+  testSearch(&b, INT_MAX, true);
+  cout << "Populating tree." << endl;
+  populateSTMTree(&b);
+  b.print_preorder();
+  cout << "Testing search." << endl;
+  testSearch(&b, 9, true);
+  testSearch(&b, 16, false);
+  cout << endl;
+}
+
+
+int test(int numthreads,int times){
 
 	float sum = 0;
 	clock_t begin_time,end_time;
 	for(int i=0;i<times;i++){
 		BST b;
 		b.initializetree();
-		if(option==1){
-			vector<thread> myThreads;
-			begin_time = clock();
-	   		for (int i=0; i<numthreads; i++){
-	      			myThreads.push_back(thread(exec, b));
-	   		}
-	   		for (int i=0; i<numthreads; i++){
-				myThreads[i].join();
-	    		}
-	   		end_time = clock();
-	    		sum += float(end_time - begin_time);
-	    	}
-	    	else if(option==2){
-			begin_time = clock();
-		    	for (int i=0; i<numthreads; i++){
-				exec(b);
-		    	}
-		    	end_time = clock();
-		    	sum += float(end_time - begin_time);
-	    	}
+		vector<thread> myThreads;
+		begin_time = clock();
+   		for (int i=0; i<numthreads; i++){
+      			myThreads.push_back(thread(exec, b));
+   		}
+   		for (int i=0; i<numthreads; i++){
+			myThreads[i].join();
+    		}
+   		end_time = clock();
+    		sum += float(end_time - begin_time);
+	    	
 	}
 	sum /= times;
-	cout<<numthreads<<":"<<option<<":"<<sum<<endl; 
+	cout<<"Time taken with "<<numthreads<<" threads is "<<sum<<endl; 
 }
 int main(int argc, char* argv[]) {
-	int numthreads,times;
-	numthreads = atoi(argv[1]);
-	times = atoi(argv[2]);
+	if (argc == 2) {
+    string s("test");
+    string t(argv[1]);
+    if (s != t) {
+      cout << "Usage: ./STMbst test" << endl
+           << "   or  ./STMbst time <numThreads> <Times>" << endl;
+      return 1;
+    }
+    // Run BST STM test
+    testSTM();
+ 
+  }
+  else if (argc == 4) {
+    string s("time");
+    string t(argv[1]);
+    if (s != t) {
+      cout << "Usage: ./STMbst test" << endl
+           << "   or  ./STMbst time <numThreads> <Times>" << endl;
+      return 1;
+    }
+    int numthreads = atoi(argv[2]);
+    int times = atoi(argv[3]);
+    test(numthreads,times);
 
-	test(1,numthreads,times);
-	test(2,numthreads,times);
+  }
+  else {
+    cout << "Usage: ./STMbst test" << endl
+         << "   or  ./STMbst time <numThreads> <Times>" << endl;
+    return 1;
+  }
+  return 0;
 	
-	return 0;    
 }
 
 

@@ -1,4 +1,8 @@
-CXX=g++
+ifeq ($(shell hostname), mc18.cs.purdue.edu)
+	CXX=g++-5.3.0
+else
+	CXX=g++
+endif
 CXXFLAGS=  -c -Wall -Wextra -pedantic-errors -std=c++11 -mcx16 -pthread -fgnu-tm
 LDFLAGS=-latomic
 SOURCES=BST.cpp SequentialBST.cpp NonBlockingBST.cpp main.cpp
