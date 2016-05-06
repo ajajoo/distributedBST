@@ -30,6 +30,12 @@ Timing of concurrent insertions can be reached by typing
 
 This will repeat a simple test <iterations> number of times: 
 
+To test out the STM implementation, repeat the same steps as above, but replace BST with STMbst, i.e.
+
+    $ ./STMbst test
+    $ ./STMbst time <numThreads> <iterations>
+    
+    
 ---
 
 ### References
